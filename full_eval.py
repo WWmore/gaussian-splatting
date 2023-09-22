@@ -30,13 +30,13 @@ all_scenes.extend(mipnerf360_indoor_scenes)
 all_scenes.extend(tanks_and_temples_scenes)
 all_scenes.extend(deep_blending_scenes)
 
-if not args.skip_training or not args.skip_rendering:
+if not args.skip_training or not args.skip_rendering: ###HuiNote: False
     parser.add_argument('--mipnerf360', "-m360", required=True, type=str)
     parser.add_argument("--tanksandtemples", "-tat", required=True, type=str)
     parser.add_argument("--deepblending", "-db", required=True, type=str)
     args = parser.parse_args()
 
-if not args.skip_training:
+if not args.skip_training: ###HuiNote: False
     common_args = " --quiet --eval --test_iterations -1 "
     for scene in mipnerf360_outdoor_scenes:
         source = args.mipnerf360 + "/" + scene
@@ -51,7 +51,7 @@ if not args.skip_training:
         source = args.deepblending + "/" + scene
         os.system("python train.py -s " + source + " -m " + args.output_path + "/" + scene + common_args)
 
-if not args.skip_rendering:
+if not args.skip_rendering: ###HuiNote: False
     all_sources = []
     for scene in mipnerf360_outdoor_scenes:
         all_sources.append(args.mipnerf360 + "/" + scene)
@@ -67,7 +67,7 @@ if not args.skip_rendering:
         os.system("python render.py --iteration 7000 -s " + source + " -m " + args.output_path + "/" + scene + common_args)
         os.system("python render.py --iteration 30000 -s " + source + " -m " + args.output_path + "/" + scene + common_args)
 
-if not args.skip_metrics:
+if not args.skip_metrics: ###HuiNote: False
     scenes_string = ""
     for scene in all_scenes:
         scenes_string += "\"" + args.output_path + "/" + scene + "\" "

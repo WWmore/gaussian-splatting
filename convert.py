@@ -7,7 +7,23 @@
 # under the terms of the LICENSE.md file.
 #
 # For inquiries contact  george.drettakis@inria.fr
-#
+
+
+##Hui: the use of ArgumentParse refer to 
+## https://docs.python.org/zh-cn/dev/library/argparse.html
+
+"""
+We provide a converter script convert.py, to extract undistorted images and SfM information from input images. 
+
+For rasterization, the camera models must be either a SIMPLE_PINHOLE or PINHOLE camera. 
+Optionally, you can use ImageMagick to resize the undistorted images. 
+This rescaling is similar to MipNeRF360, i.e., it creates images with 1/2, 1/4 and 1/8 the original resolution 
+in corresponding folders. 
+
+To use them, please first install a recent version of COLMAP (ideally CUDA-powered) and ImageMagick. 
+Put the images you want to use in a directory <location>/input.
+"""
+
 
 import os
 import logging
@@ -16,13 +32,13 @@ import shutil
 
 # This Python script is based on the shell converter script provided in the MipNerF 360 repository.
 parser = ArgumentParser("Colmap converter")
-parser.add_argument("--no_gpu", action='store_true')
-parser.add_argument("--skip_matching", action='store_true')
-parser.add_argument("--source_path", "-s", required=True, type=str)
-parser.add_argument("--camera", default="OPENCV", type=str)
-parser.add_argument("--colmap_executable", default="", type=str)
-parser.add_argument("--resize", action="store_true")
-parser.add_argument("--magick_executable", default="", type=str)
+parser.add_argument("--no_gpu", action='store_true') ##Hui: --name represents this parameter will be used, elsewise without --, then not be used.
+parser.add_argument("--skip_matching", action='store_true') ##Flag to indicate that COLMAP info is available for images.
+parser.add_argument("--source_path", "-s", required=True, type=str) ##Location of the inputs
+parser.add_argument("--camera", default="OPENCV", type=str) ##Which camera model to use for the early matching steps, OPENCV by default.
+parser.add_argument("--colmap_executable", default="", type=str) ##Path to the COLMAP executable (.bat on Windows).
+parser.add_argument("--resize", action="store_true") ## Flag for creating resized versions of input images.
+parser.add_argument("--magick_executable", default="", type=str) ##Path to the ImageMagick executable.
 args = parser.parse_args()
 colmap_command = '"{}"'.format(args.colmap_executable) if len(args.colmap_executable) > 0 else "colmap"
 magick_command = '"{}"'.format(args.magick_executable) if len(args.magick_executable) > 0 else "magick"
@@ -71,29 +87,29 @@ img_undist_cmd = (colmap_command + " image_undistorter \
     --image_path " + args.source_path + "/input \
     --input_path " + args.source_path + "/distorted/sparse/0 \
     --output_path " + args.source_path + "\
-    --output_type COLMAP")
+    --output_type COLMAP") ###HuiNote: read images in /input folder, create /distorted/sparse/0
 exit_code = os.system(img_undist_cmd)
 if exit_code != 0:
     logging.error(f"Mapper failed with code {exit_code}. Exiting.")
     exit(exit_code)
 
-files = os.listdir(args.source_path + "/sparse")
-os.makedirs(args.source_path + "/sparse/0", exist_ok=True)
+files = os.listdir(args.source_path + "/sparse") ###HuiNote: folder /sparse
+os.makedirs(args.source_path + "/sparse/0", exist_ok=True)  ###HuiNote: folder /sparse/0
 # Copy each file from the source directory to the destination directory
 for file in files:
-    if file == '0':
+    if file == '0':  ###HuiNote: if folder name == 0
         continue
     source_file = os.path.join(args.source_path, "sparse", file)
     destination_file = os.path.join(args.source_path, "sparse", "0", file)
     shutil.move(source_file, destination_file)
 
-if(args.resize):
+if(args.resize): ###HuiNote:True
     print("Copying and resizing...")
 
     # Resize images.
-    os.makedirs(args.source_path + "/images_2", exist_ok=True)
-    os.makedirs(args.source_path + "/images_4", exist_ok=True)
-    os.makedirs(args.source_path + "/images_8", exist_ok=True)
+    os.makedirs(args.source_path + "/images_2", exist_ok=True) ###HuiNote: no such folder, resize 1/2
+    os.makedirs(args.source_path + "/images_4", exist_ok=True) ###HuiNote: no such folder, resize 1/4
+    os.makedirs(args.source_path + "/images_8", exist_ok=True) ###HuiNote: no such folder, resize 1/8
     # Get the list of files in the source directory
     files = os.listdir(args.source_path + "/images")
     # Copy each file from the source directory to the destination directory

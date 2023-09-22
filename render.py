@@ -54,11 +54,11 @@ if __name__ == "__main__":
     model = ModelParams(parser, sentinel=True)
     pipeline = PipelineParams(parser)
     parser.add_argument("--iteration", default=-1, type=int)
-    parser.add_argument("--skip_train", action="store_true")
-    parser.add_argument("--skip_test", action="store_true")
-    parser.add_argument("--quiet", action="store_true")
+    parser.add_argument("--skip_train", action="store_true") ##Flag to skip rendering the training set.
+    parser.add_argument("--skip_test", action="store_true") ##Flag to skip rendering the test set.
+    parser.add_argument("--quiet", action="store_true") ##Flag to omit any text written to standard out pipe.
     args = get_combined_args(parser)
-    print("Rendering " + args.model_path)
+    print("Rendering " + args.model_path) ##path to the trained model directory you want to create renderings for.
 
     # Initialize system state (RNG)
     safe_state(args.quiet)
