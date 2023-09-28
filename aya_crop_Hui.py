@@ -16,10 +16,11 @@ def main(full_path, cut_name):
     # Load the PLY files using plyfile
     new_path = cut_name + r'.ply'
     full_ply = PlyData.read(full_path)
-    cropped_pcd = o3d.io.read_point_cloud(new_path)
-
-    cropped_points = np.asarray(cropped_pcd.points)
     full_points = np.array([list(point) for point in full_ply['vertex'].data])
+
+    cropped_pcd = o3d.io.read_point_cloud(new_path)
+    cropped_points = np.asarray(cropped_pcd.points)
+    
 
     # Split full_points into chunks for parallel processing
     num_workers = 60  # Adjust this based on your CPU's cores
@@ -60,8 +61,8 @@ if __name__ == "__main__":
 
     "produced extracted base Gaussian-Splatting data of the full_ply"
     path = r'C:\Users\WANGH0M\gaussian-splatting\output'
-    full_path = path + r'\out_bonsai_old\point_cloud\iteration_30000\point_cloud.ply'
-    cut_name = path + r'\bonsai_old_cut'
+    full_path = path + r'\out_bonsai_new\point_cloud\iteration_30000\point_cloud.ply'
+    cut_name = path + r'\bonsai_new_cut'
     main(full_path, cut_name)
 
     "read the filtered.ply"
