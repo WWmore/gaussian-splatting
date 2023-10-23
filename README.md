@@ -54,7 +54,6 @@ Viewers
     |---Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
 
 
-https://github.com/WWmore/gaussian-splatting/blob/b858a1ff41f2703c604d4d7b445cfe7392f8957c/docs_Hui/beacon_cut_small.mp4
+https://github.com/WWmore/gaussian-splatting/assets/28695253/d1d8aaeb-a890-434e-95b8-acf526bea44b
 
 
-![KAUST Beacon](docs_Hui/beacon_cut_small.mp4)
