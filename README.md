@@ -2,6 +2,7 @@ This repository is forked from the [repository](https://github.com/graphdeco-inr
 
 Followed up papers are updated [here](https://github.com/MrNeRF/awesome-3D-gaussian-splatting).
 
+## Installing and running
 The installation can refer to a step-by-step [Youtube tutorial](https://www.youtube.com/watch?v=UXtuigy_wYc).
 
 <details>
@@ -47,17 +48,18 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
 </details>
 <br>
 
+## Visualization
 The default viewer is by SIBR. Another viewer is by Unity (free to use) as seen [here](https://github.com/aras-p/UnityGaussianSplatting). Based on my experience, the comparison between them are
 
 SIBR Viewer
 - Pros.: focused view of the object when opening
 - Cons.: need keyboard to navigate, mouse control is so bad even freezes the GUI
+https://github.com/WWmore/gaussian-splatting/assets/28695253/d1d8aaeb-a890-434e-95b8-acf526bea44b
+  
 Unity Viewer
 - Pros.: can directly trim the Gaussian Splatting in the scene and export the ply; parameters are interactivly set
 - Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
+- 
+https://github.com/WWmore/gaussian-splatting/assets/28695253/21ccd9fd-ef3e-4a74-817f-f2dcd27ae661
 
 
-https://github.com/WWmore/gaussian-splatting/assets/28695253/d1d8aaeb-a890-434e-95b8-acf526bea44b
-
-
-![alt-text-1](docs_Hui/beacon_cut_small.mp4 "SIBR") ![alt-text-2](docs_Hui/beacon_unity_small.mp4 "Unity")
