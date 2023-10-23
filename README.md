@@ -49,13 +49,15 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
 
 The default viewer is by SIBR. Another viewer is by Unity (free to use) as seen [here](https://github.com/aras-p/UnityGaussianSplatting). Based on my experience, the comparison between them are
 
-Viewers
-|---SIBR
-|   |---Pros.: focused view of the object when opening
-|   |---Cons.: need keyboard to navigate, mouse control is so bad even freezes the GUI
-|---Unity
-|   |---Pros.: can directly trim the Gaussian Splatting in the scene and export the ply; parameters are interactivly set
-|   |---Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
+SIBR Viewer
+- Pros.: focused view of the object when opening
+- Cons.: need keyboard to navigate, mouse control is so bad even freezes the GUI
+Unity Viewer
+- Pros.: can directly trim the Gaussian Splatting in the scene and export the ply; parameters are interactivly set
+- Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
 
 
 https://github.com/WWmore/gaussian-splatting/assets/28695253/d1d8aaeb-a890-434e-95b8-acf526bea44b
+
+
+![alt-text-1](docs_Hui/beacon_cut_small.mp4 "SIBR") ![alt-text-2](docs_Hui/beacon_unity_small.mp4 "Unity")
