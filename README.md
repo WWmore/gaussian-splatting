@@ -6,6 +6,7 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
 
 <details>
 <summary><span style="font-weight: bold;">Installation steps in Anaconda</span></summary>
+
   - open Anaconda Prompt
   - cd C:User/<username>
   - git clone https://github.com/graphdeco-inria/gaussian-splatting --recursive
@@ -25,10 +26,12 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
   - pip install cupy
   - pip install probreg
   - pip install pillow-heif
+
 </details>
 
 <details>
 <summary><span style="font-weight: bold;">Running in Anaconda Prompt</span></summary>
+
   - open Anaconda Prompt
   - conda activate gaussian_splatting
   - cd C:\User\<username>\gaussian-splatting
@@ -40,6 +43,7 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
   - cd viewers/bin
   - SIBR_gaussianViewer_app.exe -m C:\Users\<username>\gaussian-splatting\output\out 
   - the GUI pops up, if not, may the CUDA support problem.
+
 </details>
 <br>
 
@@ -47,13 +51,11 @@ The default viewer is by SIBR. Another viewer is by Unity (free to use) as seen 
 
 Viewers
 |---SIBR
-    |---Pros.: focused view of the object when opening
-    |---Cons.: need keyboard to navigate, mouse control is so bad even freezes the GUI
+|   |---Pros.: focused view of the object when opening
+|   |---Cons.: need keyboard to navigate, mouse control is so bad even freezes the GUI
 |---Unity
-    |---Pros.: can directly trim the Gaussian Splatting in the scene and export the ply; parameters are interactivly set
-    |---Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
+|   |---Pros.: can directly trim the Gaussian Splatting in the scene and export the ply; parameters are interactivly set
+|   |---Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
 
 
 https://github.com/WWmore/gaussian-splatting/assets/28695253/d1d8aaeb-a890-434e-95b8-acf526bea44b
-
-
