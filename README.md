@@ -1,4 +1,4 @@
-This repository is forked from the [repository](https://github.com/graphdeco-inria/gaussian-splatting), which is the source code for the best paper [##3D Gaussian Splatting for Real-Time Radiance Field Rendering##](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) in SIGGRAPH 2023.
+This repository is forked from the [repository](https://github.com/graphdeco-inria/gaussian-splatting), which is the source code for the best paper [3D Gaussian Splatting for Real-Time Radiance Field Rendering](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) in SIGGRAPH 2023.
 
 Followed up papers are updated [here](https://github.com/MrNeRF/awesome-3D-gaussian-splatting).
 
@@ -54,7 +54,7 @@ Viewers
     |---Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
 
 
-<img src="https://github.com/WWmore/gaussian-splatting/blob/b858a1ff41f2703c604d4d7b445cfe7392f8957c/docs_Hui/beacon_cut_small.mp4" width="200">
+https://github.com/WWmore/gaussian-splatting/blob/b858a1ff41f2703c604d4d7b445cfe7392f8957c/docs_Hui/beacon_cut_small.mp4
 
-docs_Hui/beacon_cut_small.mp4
 
+![KAUST Beacon](docs_Hui/beacon_cut_small.mp4)
