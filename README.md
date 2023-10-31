@@ -81,6 +81,6 @@ PlayCanvas Viewer
 - Pros.: directly import .ply to show online; high resolution; easy navigation; suitable to share
 - Cons.: no editting(trim)
 
-![File](docs_Hui/plancanvas.png)
+![File](docs_Hui/playcanvas.png)
 
 
