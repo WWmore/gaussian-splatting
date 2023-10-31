@@ -49,18 +49,38 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
 <br>
 
 ## Visualization
-The default viewer is by SIBR. Another viewer is by Unity (free to use) as seen [here](https://github.com/aras-p/UnityGaussianSplatting). Based on my experience, the comparison between them are
+The default viewer is by SIBR. Other viewers are developing gradually. 
+I test several viewers, including SIBR, Unity, Blender and PlayCanvas, and comment the comparsion between them as seen below:
 
 SIBR Viewer
+- Source: default viewer from the paper
 - Pros.: focused view of the object when opening
 - Cons.: need keyboard to navigate, mouse control is so bad even freezes the GUI
   
 https://github.com/WWmore/gaussian-splatting/assets/28695253/d1d8aaeb-a890-434e-95b8-acf526bea44b
   
+
 Unity Viewer
+- Source: [Unity](https://github.com/aras-p/UnityGaussianSplatting) (free-to-use) 
 - Pros.: can directly trim the Gaussian Splatting in the scene and export the ply; parameters are interactivly set
 - Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
   
 https://github.com/WWmore/gaussian-splatting/assets/28695253/21ccd9fd-ef3e-4a74-817f-f2dcd27ae661
+
+
+Blender Viewer
+- Source: [Blender addon](https://github.com/ReshotAI/gaussian-splatting-blender-addon) in Github
+- Pros.: presented as point-cloud; can directly edit(trim) in the scene and export; controlled size
+- Cons.: low resolution; only presented in render view by Cycles; slow process
+
+![File](docs_Hui/blender.png)
+
+
+PlayCanvas Viewer
+- Source: [PlayCanvas](https://github.com/playcanvas/model-viewer) online
+- Pros.: directly import .ply to show online; high resolution; easy navigation; suitable to share
+- Cons.: no editting(trim)
+
+![File](docs_Hui/plancanvas.png)
 
 
