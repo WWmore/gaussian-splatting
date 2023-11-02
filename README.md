@@ -50,7 +50,7 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
 
 ## Visualization
 The default viewer is by SIBR. Other viewers are developing gradually. 
-I test several viewers, including SIBR, Unity, Blender and PlayCanvas, and comment the comparsion between them as seen below:
+I test several viewers, including SIBR, Unity, Blender, PlayCanvas and viewer in DreamGaussian, and comment the comparsion between them as seen below:
 
 SIBR Viewer
 - Source: default viewer from the paper
@@ -83,4 +83,11 @@ PlayCanvas Viewer
 
 ![File](docs_Hui/playcanvas.png)
 
+
+DreamGaussian Viewer
+- Source: [DreamGaussian](https://github.com/dreamgaussian/dreamgaussian) viewer
+- Pros.: import .ply to navigate; three modes: image, depth, alpha to show
+- Cons.: no editting(trim); can save a mesh with texture, but very bad quality
+
+![File](docs_Hui/dreamgaussian.png)
 
