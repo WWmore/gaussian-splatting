@@ -91,3 +91,62 @@ DreamGaussian Viewer
 
 ![File](docs_Hui/dreamgaussian.png)
 
+
+
+
+
+## Cleaning noisy splatters
+
+There have been several ways to delete unwanted splatters by GUI, such as [Unity](https://github.com/aras-p/UnityGaussianSplatting), [Blender Plugin](https://github.com/ReshotAI/gaussian-splatting-blender-addon/tree/master), [SuperSplat](https://github.com/playcanvas/super-splat) and so on. 
+
+Or running the code:
+```bash
+python 3dgsconverter.py -i input_3dgs.ply -o output_dr.ply -f cc --density_filter --remove_flyers
+```
+where `input_3dgs.ply` is the input path to the Gaussian Splatting .ply file and `output_dr.ply` is the output path to the trimmed one by filtering (`density_filter`) the region with higher point density and removing (`remove_flyers`) the lower ones.
+
+![File](docs_Hui/dr.png)
+
+
+## GS to pointcloud with colors
+
+Running the code:
+```bash
+python 3dgsconverter.py -i input_3dgs.ply -o output_cc.ply -f cc --rgb
+```
+where input Gaussian Splatting `input_3dgs.ply` is produced to be pointcloud `output_cc.ply` with colors.
+
+Together with the cleaning process, this process can be organized by one commond:
+```bash
+python 3dgsconverter.py -i input_3dgs.ply -o output_drcc.ply -f cc --density_filter --remove_flyers --rgb
+```
+
+Pointcloud `output_drcc.ply` can be visualized in MeshLab:
+![File](docs_Hui/drcc.png)
+
+If one wants to turn the pointcloud back to Gaussian Splatting, run below:
+```bash
+python 3dgsconverter.py -i input_drcc.ply -o output_drcc_3dgs.ply -f 3dgs
+```
+
+* Note: But if one continues to repeat the deleting process, it won't work (the produced `_dr.ply` file is the same).
+
+## Pointcloud to mesh with texture
+
+There stil an open problem about reconstruction a good mesh with texture from pointcloud produced from 3D Gaussian Splattings. 
+Below are some tryings.
+
+### Open3D
+There are three ways `Alpha Shapes [Edelsbrunner1983]`, `Ball Pivoting [Bernardini1999]`, and `Poisson Surface Reconstruction [Kazhdan2006]` to reconstruct a mesh from pointcloud, however they all need the vertex normal information.
+
+### MeshLab
+MeshLab also has the famous `Poisson Surface Reconstruction [Kazhdan2006]` function to reconstruct a mesh, however the produced one is far away from the ideal one.
+
+Function `Ball Pivoting [Bernardini1999]` can help to produce one, but it is quite messy with some parts missing.
+![File](docs_Hui/meshlab.png)
+
+### Parametric Gauss Reconstruction
+As introduced in the paper [Surface Reconstruction from Point Clouds without Normals by Parametrizing the Gauss Formula (SIGGRAPH 2023)](https://jsnln.github.io/tog2022_pgr/index.html), the method `PGR` can help to reconstruct a mesh from pointcloud without normals.
+However, the test one [shows](https://github.com/WWmore/ParametricGaussRecon) the result is not good.
+
+![File](docs_Hui/PGR.png)
