@@ -1,6 +1,10 @@
 This repository is forked from the [repository](https://github.com/graphdeco-inria/gaussian-splatting), which is the source code for the best paper [3D Gaussian Splatting for Real-Time Radiance Field Rendering](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) in SIGGRAPH 2023.
 
-Followed up papers are updated [here](https://github.com/MrNeRF/awesome-3D-gaussian-splatting).
+* Followed up papers are updated [here](https://github.com/MrNeRF/awesome-3D-gaussian-splatting).
+
+* [Math theory](https://github.com/chiehwangs/3d-gaussian-theory) to understand what is 3D Gaussians.
+
+* [201 tips](https://medium.com/@AriaLeeNotAriel/numbynum-3d-gaussian-splatting-for-real-time-radiance-field-rendering-kerbl-et-al-60c0b25e5544) to understand the paper in details.
 
 ## Installing and running
 The installation can refer to a step-by-step [Youtube tutorial](https://www.youtube.com/watch?v=UXtuigy_wYc).
@@ -85,15 +89,25 @@ https://github.com/WWmore/gaussian-splatting/assets/28695253/21ccd9fd-ef3e-4a74-
 
 
 5. DreamGaussian Viewer
-- Source: [DreamGaussian](https://github.com/dreamgaussian/dreamgaussian) viewer
+- Source: [DreamGaussian](https://github.com/WWmore/gaussian-splatting) viewer
 - Pros.: import .ply to navigate; three modes: image, depth, alpha to show
 - Cons.: no editting(trim); can save a mesh with texture, but very bad quality
 
 ![File](docs_Hui/dreamgaussian.png)
 
 
+* Note: DreamGaussian provides a way to get a textured mesh from one input image, but the mesh quality is very bad as seen [here](https://github.com/WWmore/gaussian-splatting).
+* Open problem: how to get a high-quality mesh with texture from images of multiview.
 
+-----------------------------------------------------------------------
 
+* Below is another idea to get a textured mesh from pointcloud (.ply) that is computed from 3D Gaussian Splatting data. 
+The pipeline is below:
+```mermaid
+graph LR
+    A(Clearning noise ) --> B(Pointcloud with color)
+    B --> C(Mesh with texture)
+```
 
 ## Cleaning noisy splatters
 
