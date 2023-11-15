@@ -6,6 +6,21 @@ This repository is forked from the [repository](https://github.com/graphdeco-inr
 
 * [201 tips](https://medium.com/@AriaLeeNotAriel/numbynum-3d-gaussian-splatting-for-real-time-radiance-field-rendering-kerbl-et-al-60c0b25e5544) to understand the paper in details.
 
+
+* [Installing and running](#installing-and-running)
+* [Visualization](#visualization)
+    * [1. SIBR Viewer](#visualization)
+    * [2. Unity Viewer](#visualization)
+    * [3. Blender Viewer](#visualization)
+    * [4. PlayCanvas Viewer](#visualization)
+    * [5. DreamGaussian Viewer](#visualization)   
+* [Cleaning noisy splatters](#cleaning-noisy-splatters)
+* [GS to pointcloud with colors](#gs-to-pointcloud-with-colors)
+* [Pointcloud to mesh with texture](#pointcloud-to-mesh-with-texture)
+    * [Open3D](#open3d)
+    * [MeshLab](#meshlab)
+    * [Parametric Gauss Reconstruction](#parametric-gauss-reconstruction)
+
 ## Installing and running
 The installation can refer to a step-by-step [Youtube tutorial](https://www.youtube.com/watch?v=UXtuigy_wYc).
 
@@ -150,16 +165,16 @@ python 3dgsconverter.py -i input_drcc.ply -o output_drcc_3dgs.ply -f 3dgs
 It's still an open problem about reconstructing a good mesh with texture from pointcloud produced from 3D Gaussian Splattings. 
 Below are some tryings.
 
-### 1. Open3D
+### Open3D
 There are three ways `Alpha Shapes [Edelsbrunner1983]`, `Ball Pivoting [Bernardini1999]`, and `Poisson Surface Reconstruction [Kazhdan2006]` to reconstruct a mesh from pointcloud, however they all need the vertex normal information in advance.
 
-### 2. MeshLab
+### MeshLab
 MeshLab also has the famous `Poisson Surface Reconstruction [Kazhdan2006]` function to reconstruct a mesh, however the produced one is far away from the ideal one. It tries to make the mesh as smooth as possible but loses the shape features.
 
 Function `Ball Pivoting [Bernardini1999]` can help to produce one. Even though the shape features looks OK, it is quite messy with some parts missing.
 ![File](docs_Hui/meshlab.png)
 
-### 3. Parametric Gauss Reconstruction
+### Parametric Gauss Reconstruction
 As introduced in the paper [Surface Reconstruction from Point Clouds without Normals by Parametrizing the Gauss Formula (SIGGRAPH 2023)](https://jsnln.github.io/tog2022_pgr/index.html), the method `PGR` can help to reconstruct a mesh from pointcloud without normals.
 However, the test one [shows](https://github.com/WWmore/ParametricGaussRecon) the result is not good.
 
