@@ -6,20 +6,21 @@ This repository is forked from the [repository](https://github.com/graphdeco-inr
 
 * [201 tips](https://medium.com/@AriaLeeNotAriel/numbynum-3d-gaussian-splatting-for-real-time-radiance-field-rendering-kerbl-et-al-60c0b25e5544) to understand the paper in details.
 
-
+---------------------------------------------------------------------------
 * [Installing and running](#installing-and-running)
 * [Visualization](#visualization)
-    * [1. SIBR Viewer](#visualization)
-    * [2. Unity Viewer](#visualization)
-    * [3. Blender Viewer](#visualization)
-    * [4. PlayCanvas Viewer](#visualization)
-    * [5. DreamGaussian Viewer](#visualization)   
+    * 1. SIBR Viewer
+    * 2. Unity Viewer
+    * 3. Blender Viewer
+    * 4. PlayCanvas Viewer
+    * 5. DreamGaussian Viewer 
 * [Cleaning noisy splatters](#cleaning-noisy-splatters)
 * [GS to pointcloud with colors](#gs-to-pointcloud-with-colors)
 * [Pointcloud to mesh with texture](#pointcloud-to-mesh-with-texture)
     * [Open3D](#open3d)
     * [MeshLab](#meshlab)
     * [Parametric Gauss Reconstruction](#parametric-gauss-reconstruction)
+---------------------------------------------------------------------------
 
 ## Installing and running
 The installation can refer to a step-by-step [Youtube tutorial](https://www.youtube.com/watch?v=UXtuigy_wYc).
@@ -71,45 +72,63 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
 The default viewer is by SIBR. Other viewers are developing gradually. 
 I test several viewers, including SIBR, Unity, Blender, PlayCanvas and viewer in DreamGaussian, and comment the comparsion between them as seen below:
 
-1. SIBR Viewer
-- Source: default viewer from the paper
-- Pros.: focused view of the object when opening
-- Cons.: need keyboard to navigate, mouse control is so bad even freezes the GUI
-  
-https://github.com/WWmore/gaussian-splatting/assets/28695253/d1d8aaeb-a890-434e-95b8-acf526bea44b
-  
+<details>
+<summary><span style="font-weight: bold;">1. SIBR Viewer</span></summary>
 
-2. Unity Viewer
-- Source: [Unity](https://github.com/aras-p/UnityGaussianSplatting) (free-to-use) 
-- Pros.: can directly trim the Gaussian Splatting in the scene and export the ply; parameters are interactivly set
-- Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
-  
-https://github.com/WWmore/gaussian-splatting/assets/28695253/21ccd9fd-ef3e-4a74-817f-f2dcd27ae661
+  - Source: default viewer from the paper
+  - Pros.: focused view of the object when opening
+  - Cons.: need keyboard to navigate, mouse control is so bad even freezes the GUI
+    
+  https://github.com/WWmore/gaussian-splatting/assets/28695253/d1d8aaeb-a890-434e-95b8-acf526bea44b
+
+</details>
 
 
-3. Blender Viewer
-- Source: [Blender addon](https://github.com/ReshotAI/gaussian-splatting-blender-addon) in Github
-- Pros.: presented as point-cloud; can directly edit(trim) in the scene and export; controlled size
-- Cons.: low resolution; only presented in render view by Cycles; slow process
+<details>
+<summary><span style="font-weight: bold;">2. Unity Viewer</span></summary>
 
-![File](docs_Hui/blender.png)
+  - Source: [Unity](https://github.com/aras-p/UnityGaussianSplatting) (free-to-use) 
+  - Pros.: can directly trim the Gaussian Splatting in the scene and export the ply; parameters are interactivly set
+  - Cons.: global view of the whole scene; tilt basement; need mouse to zoom in-out; hard to control
+    
+  https://github.com/WWmore/gaussian-splatting/assets/28695253/21ccd9fd-ef3e-4a74-817f-f2dcd27ae661
 
-
-4. PlayCanvas Viewer
-- Source: [PlayCanvas](https://github.com/playcanvas/model-viewer) online
-- Pros.: directly import .ply to show online; high resolution; easy navigation; suitable to share
-- Cons.: no editting(trim)
-
-![File](docs_Hui/playcanvas.png)
+</details>
 
 
-5. DreamGaussian Viewer
-- Source: [DreamGaussian](https://github.com/WWmore/gaussian-splatting) viewer
-- Pros.: import .ply to navigate; three modes: image, depth, alpha to show
-- Cons.: no editting(trim); can save a mesh with texture, but very bad quality
+<details>
+<summary><span style="font-weight: bold;">3. Blender Viewer</span></summary>
 
-![File](docs_Hui/dreamgaussian.png)
+  - Source: [Blender addon](https://github.com/ReshotAI/gaussian-splatting-blender-addon) in Github
+  - Pros.: presented as point-cloud; can directly edit(trim) in the scene and export; controlled size
+  - Cons.: low resolution; only presented in render view by Cycles; slow process
 
+  ![File](docs_Hui/blender.png) 
+
+</details>
+
+
+<details>
+<summary><span style="font-weight: bold;">4. PlayCanvas Viewer</span></summary>
+
+  - Source: [PlayCanvas](https://github.com/playcanvas/model-viewer) online
+  - Pros.: directly import .ply to show online; high resolution; easy navigation; suitable to share
+  - Cons.: no editting(trim)
+
+  ![File](docs_Hui/playcanvas.png)
+
+</details>
+
+<details>
+<summary><span style="font-weight: bold;">5. DreamGaussian Viewer</span></summary>
+
+  - Source: [DreamGaussian](https://github.com/WWmore/gaussian-splatting) viewer
+  - Pros.: import .ply to navigate; three modes: image, depth, alpha to show
+  - Cons.: no editting(trim); can save a mesh with texture, but very bad quality
+
+  ![File](docs_Hui/dreamgaussian.png)
+
+</details>
 
 * Note: DreamGaussian provides a way to get a textured mesh from one input image, but the mesh quality is very bad as seen [here](https://github.com/WWmore/gaussian-splatting).
 * Open problem: how to get a high-quality mesh with texture from images of multiview.
@@ -120,8 +139,9 @@ https://github.com/WWmore/gaussian-splatting/assets/28695253/21ccd9fd-ef3e-4a74-
 The pipeline is below:
 ```mermaid
 graph LR
-    A(Clearning noise ) --> B(Pointcloud with color)
-    B --> C(Mesh with texture)
+    A(Gaussian Splatting) --> B(Clearning noise)
+    B --> C(Pointcloud with color)
+    C --> D(Mesh with texture)
 ```
 
 ## Cleaning noisy splatters
