@@ -171,7 +171,8 @@ python 3dgsconverter.py -i input_3dgs.ply -o output_drcc.ply -f cc --density_fil
 ```
 
 Colored pointcloud `output_drcc.ply` can be visualized in MeshLab:
-![File](docs_Hui/drcc.png)
+<!-- ![File](docs_Hui/drcc.png) -->
+<img src="docs_Hui/drcc.png" align="center" width="300">
 
 If one wants to turn the pointcloud back to Gaussian Splatting, run below:
 ```bash
