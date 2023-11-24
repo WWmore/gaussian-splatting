@@ -58,6 +58,7 @@ The installation can refer to a step-by-step [Youtube tutorial](https://www.yout
   - cd C:\User\<username>\gaussian-splatting
   - put images in the folder data/input
   - python convert.py -s data (wait within 5 mins)
+    > produced 4 new folders: `images`, `sparse`, `distroted` and `stereo`, where only the first two are important.
   - python train.py -s data (wait around 1h)
   - output GaussianSplatting ply appears in the folder output/<name>
   - rename <name> to out
