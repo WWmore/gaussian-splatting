@@ -22,6 +22,9 @@ in corresponding folders.
 
 To use them, please first install a recent version of COLMAP (ideally CUDA-powered) and ImageMagick. 
 Put the images you want to use in a directory <location>/input.
+
+Hui: the only needed files in the initilization stage are: 
+    input, images, sparse/0/cameras.bin,images.bin,points3D.bin, points3D.ply
 """
 
 
@@ -45,7 +48,7 @@ magick_command = '"{}"'.format(args.magick_executable) if len(args.magick_execut
 use_gpu = 1 if not args.no_gpu else 0
 
 if not args.skip_matching:
-    os.makedirs(args.source_path + "/distorted/sparse", exist_ok=True)
+    os.makedirs(args.source_path + "/distorted/sparse", exist_ok=True) ##Huinote: files in "/distorted/sparse" later are copied into sparse/0
 
     ## Feature extraction
     feat_extracton_cmd = colmap_command + " feature_extractor "\
@@ -94,7 +97,7 @@ if exit_code != 0:
     exit(exit_code)
 
 files = os.listdir(args.source_path + "/sparse") ###HuiNote: folder /sparse
-os.makedirs(args.source_path + "/sparse/0", exist_ok=True)  ###HuiNote: folder /sparse/0
+os.makedirs(args.source_path + "/sparse/0", exist_ok=True)  ###HuiNote: useful folder /sparse/0
 # Copy each file from the source directory to the destination directory
 for file in files:
     if file == '0':  ###HuiNote: if folder name == 0
@@ -114,23 +117,23 @@ if(args.resize): ###HuiNote:True
     files = os.listdir(args.source_path + "/images")
     # Copy each file from the source directory to the destination directory
     for file in files:
-        source_file = os.path.join(args.source_path, "images", file)
+        source_file = os.path.join(args.source_path, "images", file) ###Huinote: save in ./images
 
-        destination_file = os.path.join(args.source_path, "images_2", file)
+        destination_file = os.path.join(args.source_path, "images_2", file) ###Huinote: no such files
         shutil.copy2(source_file, destination_file)
         exit_code = os.system(magick_command + " mogrify -resize 50% " + destination_file)
         if exit_code != 0:
             logging.error(f"50% resize failed with code {exit_code}. Exiting.")
             exit(exit_code)
 
-        destination_file = os.path.join(args.source_path, "images_4", file)
+        destination_file = os.path.join(args.source_path, "images_4", file) ###Huinote: no such files
         shutil.copy2(source_file, destination_file)
         exit_code = os.system(magick_command + " mogrify -resize 25% " + destination_file)
         if exit_code != 0:
             logging.error(f"25% resize failed with code {exit_code}. Exiting.")
             exit(exit_code)
 
-        destination_file = os.path.join(args.source_path, "images_8", file)
+        destination_file = os.path.join(args.source_path, "images_8", file) ###Huinote: no such files
         shutil.copy2(source_file, destination_file)
         exit_code = os.system(magick_command + " mogrify -resize 12.5% " + destination_file)
         if exit_code != 0:

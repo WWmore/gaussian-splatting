@@ -34,6 +34,8 @@ def remove_batches(folder):
 
 folder = r'C:\Users\WANGH0M\gaussian-splatting\data_coral_rmbg\images'
 
+folder = r'C:\Users\WANGH0M\gaussian-splatting\GS_2_mesh\data\wizard\images'
+
 #remove_1_image(folder+'\IMG_6115.png',folder+'\IMG_6115_1.png')
 
 remove_batches(folder)

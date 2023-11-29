@@ -18,7 +18,7 @@ from scene.gaussian_model import GaussianModel
 from arguments import ModelParams
 from utils.camera_utils import cameraList_from_camInfos, camera_to_JSON
 
-class Scene:
+class Scene: ##Hui: used in train.py and render.py
 
     gaussians : GaussianModel
 
@@ -27,28 +27,28 @@ class Scene:
         :param path: Path to colmap scene main folder.
         """
         self.model_path = args.model_path
-        self.loaded_iter = None
+        self.loaded_iter = None ###Hui will be assigned 7000 or 30000
         self.gaussians = gaussians
 
         if load_iteration:
-            if load_iteration == -1:
+            if load_iteration == -1: ##Hui: only in render.py; the default==-1
                 self.loaded_iter = searchForMaxIteration(os.path.join(self.model_path, "point_cloud"))
             else:
-                self.loaded_iter = load_iteration
+                self.loaded_iter = load_iteration ##Hui: 30_000 in arguments/__init__.py/self.iterations=30_000
             print("Loading trained model at iteration {}".format(self.loaded_iter))
 
         self.train_cameras = {}
         self.test_cameras = {}
 
-        if os.path.exists(os.path.join(args.source_path, "sparse")):
+        if os.path.exists(os.path.join(args.source_path, "sparse")): ##Hui: True
             scene_info = sceneLoadTypeCallbacks["Colmap"](args.source_path, args.images, args.eval)
-        elif os.path.exists(os.path.join(args.source_path, "transforms_train.json")):
+        elif os.path.exists(os.path.join(args.source_path, "transforms_train.json")): ##Hui: False
             print("Found transforms_train.json file, assuming Blender data set!")
             scene_info = sceneLoadTypeCallbacks["Blender"](args.source_path, args.white_background, args.eval)
         else:
             assert False, "Could not recognize scene type!"
 
-        if not self.loaded_iter:
+        if not self.loaded_iter: ##Hui: guess False
             with open(scene_info.ply_path, 'rb') as src_file, open(os.path.join(self.model_path, "input.ply") , 'wb') as dest_file:
                 dest_file.write(src_file.read())
             json_cams = []
@@ -66,7 +66,7 @@ class Scene:
             random.shuffle(scene_info.train_cameras)  # Multi-res consistent random shuffling
             random.shuffle(scene_info.test_cameras)  # Multi-res consistent random shuffling
 
-        self.cameras_extent = scene_info.nerf_normalization["radius"]
+        self.cameras_extent = scene_info.nerf_normalization["radius"] ##Hui: called in create_from_pcd as spatial_lr_scale
 
         for resolution_scale in resolution_scales:
             print("Loading Training Cameras")
@@ -81,6 +81,7 @@ class Scene:
                                                            "point_cloud.ply"))
         else:
             self.gaussians.create_from_pcd(scene_info.point_cloud, self.cameras_extent)
+            ##Hui: seems only place use scene_info.point_cloud i.e. sparse/0/points3D.ply;  to assign initial value
 
     def save(self, iteration):
         point_cloud_path = os.path.join(self.model_path, "point_cloud/iteration_{}".format(iteration))

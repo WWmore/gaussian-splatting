@@ -80,7 +80,7 @@ def read_next_bytes(fid, num_bytes, format_char_sequence, endian_character="<"):
     data = fid.read(num_bytes)
     return struct.unpack(endian_character + format_char_sequence, data)
 
-def read_points3D_text(path):
+def read_points3D_text(path): ##Hui: points3D.txt, no use
     """
     see: src/base/reconstruction.cc
         void Reconstruction::ReadPoints3DText(const std::string& path)
@@ -122,7 +122,7 @@ def read_points3D_text(path):
 
     return xyzs, rgbs, errors
 
-def read_points3D_binary(path_to_model_file):
+def read_points3D_binary(path_to_model_file): ##Hui: points3D.bin
     """
     see: src/base/reconstruction.cc
         void Reconstruction::ReadPoints3DBinary(const std::string& path)
@@ -153,7 +153,7 @@ def read_points3D_binary(path_to_model_file):
             errors[p_id] = error
     return xyzs, rgbs, errors
 
-def read_intrinsics_text(path):
+def read_intrinsics_text(path): ##Hui: cameras.txt, no use
     """
     Taken from https://github.com/colmap/colmap/blob/dev/scripts/python/read_write_model.py
     """
@@ -177,7 +177,7 @@ def read_intrinsics_text(path):
                                             params=params)
     return cameras
 
-def read_extrinsics_binary(path_to_model_file):
+def read_extrinsics_binary(path_to_model_file): ##Hui: read images.bin
     """
     see: src/base/reconstruction.cc
         void Reconstruction::ReadImagesBinary(const std::string& path)
@@ -212,7 +212,7 @@ def read_extrinsics_binary(path_to_model_file):
     return images
 
 
-def read_intrinsics_binary(path_to_model_file):
+def read_intrinsics_binary(path_to_model_file): ##Hui: read cameras.bin
     """
     see: src/base/reconstruction.cc
         void Reconstruction::WriteCamerasBinary(const std::string& path)

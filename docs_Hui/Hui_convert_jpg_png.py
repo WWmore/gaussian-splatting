@@ -12,6 +12,7 @@ path = os.path.dirname(os.path.abspath(__file__))
 
 directory = r'C:\Users\WANGH0M\gaussian-splatting\data_bonsai_old\input'
 directory = r'C:\Users\WANGH0M\gaussian-splatting\data_bonsai_new\input'
+directory = r'C:\Users\WANGH0M\gaussian-splatting\data_office\input'
 
 files = [f for f in os.listdir(directory) if f.endswith('.HEIC') or f.endswith('.heif')]
 #print(files)

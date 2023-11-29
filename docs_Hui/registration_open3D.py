@@ -12,16 +12,21 @@ import copy
 
 
 print("1. Load two point clouds and show initial pose")
+path = r'C:\Users\WANGH0M\gaussian-splatting\output'
 
 if 0:
     demo_colored_icp_pcds = o3d.data.DemoColoredICPPointClouds() ## AttributeError: module 'open3d' has no attribute 'data'
     source = o3d.io.read_point_cloud(demo_colored_icp_pcds.paths[0])
     target = o3d.io.read_point_cloud(demo_colored_icp_pcds.paths[1])
-else:
-    path = r'C:\Users\WANGH0M\gaussian-splatting\output'
+elif 0:
     old_path = path + r'\bonsai_old_cut.ply'
     new_path = path + r'\bonsai_new_cut.ply'
     source = o3d.io.read_point_cloud(old_path)
+    target = o3d.io.read_point_cloud(new_path)
+else:
+    full_path = path + r'\out_bonsai_new\point_cloud\iteration_30000\point_cloud.ply'
+    new_path = path + r'\bonsai_new_cut.ply'
+    source = o3d.io.read_point_cloud(full_path)
     target = o3d.io.read_point_cloud(new_path)
 
 def unitscale(source, target):

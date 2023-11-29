@@ -63,7 +63,7 @@ def getNerfppNorm(cam_info):
 
     translate = -center
 
-    return {"translate": translate, "radius": radius}
+    return {"translate": translate, "radius": radius} ##Hui: only radius is called; in scene/__init__.py  as spatial_lr_scale
 
 def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
     cam_infos = []
@@ -112,7 +112,7 @@ def fetchPly(path):
     normals = np.vstack([vertices['nx'], vertices['ny'], vertices['nz']]).T
     return BasicPointCloud(points=positions, colors=colors, normals=normals)
 
-def storePly(path, xyz, rgb):
+def storePly(path, xyz, rgb): ##Hui: only used in Random initialization
     # Define the dtype for the structured array
     dtype = [('x', 'f4'), ('y', 'f4'), ('z', 'f4'),
             ('nx', 'f4'), ('ny', 'f4'), ('nz', 'f4'),
@@ -129,13 +129,13 @@ def storePly(path, xyz, rgb):
     ply_data = PlyData([vertex_element])
     ply_data.write(path)
 
-def readColmapSceneInfo(path, images, eval, llffhold=8):
-    try:
+def readColmapSceneInfo(path, images, eval, llffhold=8): ##Hui: called; core function in this file
+    try:##Hui:True
         cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.bin")
         cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.bin")
         cam_extrinsics = read_extrinsics_binary(cameras_extrinsic_file)
         cam_intrinsics = read_intrinsics_binary(cameras_intrinsic_file)
-    except:
+    except: ##Hui:False
         cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.txt")
         cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.txt")
         cam_extrinsics = read_extrinsics_text(cameras_extrinsic_file)
@@ -156,15 +156,15 @@ def readColmapSceneInfo(path, images, eval, llffhold=8):
 
     ply_path = os.path.join(path, "sparse/0/points3D.ply")
     bin_path = os.path.join(path, "sparse/0/points3D.bin")
-    txt_path = os.path.join(path, "sparse/0/points3D.txt")
-    if not os.path.exists(ply_path):
+    txt_path = os.path.join(path, "sparse/0/points3D.txt") ##Huinote: no points3D.txt
+    if not os.path.exists(ply_path): ##Hui: Fig.7 for Random initialization if points3d.ply doesnot exist. 
         print("Converting point3d.bin to .ply, will happen only the first time you open the scene.")
         try:
             xyz, rgb, _ = read_points3D_binary(bin_path)
         except:
             xyz, rgb, _ = read_points3D_text(txt_path)
         storePly(ply_path, xyz, rgb)
-    try:
+    try: ##Hui:True
         pcd = fetchPly(ply_path)
     except:
         pcd = None
@@ -176,7 +176,7 @@ def readColmapSceneInfo(path, images, eval, llffhold=8):
                            ply_path=ply_path)
     return scene_info
 
-def readCamerasFromTransforms(path, transformsfile, white_background, extension=".png"):
+def readCamerasFromTransforms(path, transformsfile, white_background, extension=".png"): ##Hui: no use
     cam_infos = []
 
     with open(os.path.join(path, transformsfile)) as json_file:
@@ -218,7 +218,7 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
             
     return cam_infos
 
-def readNerfSyntheticInfo(path, white_background, eval, extension=".png"):
+def readNerfSyntheticInfo(path, white_background, eval, extension=".png"): ##Hui: no use
     print("Reading Training Transforms")
     train_cam_infos = readCamerasFromTransforms(path, "transforms_train.json", white_background, extension)
     print("Reading Test Transforms")
@@ -231,7 +231,7 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png"):
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
     ply_path = os.path.join(path, "points3d.ply")
-    if not os.path.exists(ply_path):
+    if not os.path.exists(ply_path): ##Hui: Fig.7 for Random initialization if points3d.ply doesnot exist. 
         # Since this data set has no colmap data, we start with random points
         num_pts = 100_000
         print(f"Generating random point cloud ({num_pts})...")
@@ -243,7 +243,7 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png"):
 
         storePly(ply_path, xyz, SH2RGB(shs) * 255)
     try:
-        pcd = fetchPly(ply_path)
+        pcd = fetchPly(ply_path) #Hui: store the points3d.ply to be used in the sfm initialization
     except:
         pcd = None
 
@@ -254,7 +254,7 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png"):
                            ply_path=ply_path)
     return scene_info
 
-sceneLoadTypeCallbacks = {
-    "Colmap": readColmapSceneInfo,
+sceneLoadTypeCallbacks = { ##Hui: parallel discussion cases called in __init__.py
+    "Colmap": readColmapSceneInfo, ##Hui: this one is True
     "Blender" : readNerfSyntheticInfo
 }

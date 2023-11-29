@@ -289,12 +289,9 @@ def replace_tie_points_by_lidar(tie_points, lidar_points, k=1): ##Hui add
     lidar_pcd.points = o3d.Vector3dVector(lidar_points)
     lidar_pcd_tree = o3d.KDTreeFlann(lidar_pcd)
 
-    tie_points_replaced = []
-    for tie in tie_points.points:
+    for i, tie in enumerate(tie_points.points):
         _, lidar_ind, _ = lidar_pcd_tree.search_knn_vector_3d(tie, k)
-        tie_lidar = lidar_pcd[lidar_ind]
-        tie_points_replaced.append(tie_lidar)
-    tie_points.points = np.array(tie_points_replaced)
+        tie_points.points[i] = lidar_pcd[lidar_ind]
     return tie_points
 
 def read_lidar(path): ##Hui add
