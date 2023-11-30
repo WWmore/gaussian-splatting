@@ -1,4 +1,8 @@
-"""Pipeline to use LiDAR data (pointcloud) to calibrate the 3D GS
+"""
+Hui: prior problem: the lidar points have different scale size than 3DGS; TODO: rescale them in the same size
+
+
+Pipeline to use LiDAR data (pointcloud) to calibrate the 3D GS
 Way1: 3DGS --> Cleaned PCs --> Colored PCs -----> Calibrated PCs  --> focused + calibrated 3DGS
                                       / \
                                        |
