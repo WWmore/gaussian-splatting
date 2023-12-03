@@ -196,30 +196,6 @@ def write_lidar_point(point):
     # pcd = o3d.io.read_point_cloud('my_pts.ply')
 
 
-# def register_colmappoint_with_lidarpoint(lidar_path, colmap_pcd):
-#     """ find closest_index in PC2 such that PC1 ~~ PC2[closest_index]
-#     PC1: colored_pc
-#     PC2: lidar_pc
-#     return: closest_index
-#     """
-#     #lidar = PlyData.read(lidar_path)
-
-#     input_las = laspy.read(lidar_path)
-#     point_records = input_las.points.copy()
-#     # calculating coordinates
-#     p_X = np.array((point_records['X'] * las_scaleX) + las_offsetX)
-#     p_Y = np.array((point_records['Y'] * las_scaleY) + las_offsetY)
-#     p_Z = np.array((point_records['Z'] * las_scaleZ) + las_offsetZ)
-
-#     xyz = np.vstack((p_X, p_Y, p_Z)).transpose()
-#     print(xyz.shape)
-
-
-#     PC1 = PC2[index]
-
-#     return PC1
-
-
 def draw_registration_result(source, target, transformation):
     import copy
     source_temp = copy.deepcopy(source)
@@ -262,7 +238,7 @@ def global_fast_registration(source, target,voxel_size=0.05): # means 5cm for th
         trans_init = np.identity(4) # np.asarray([[0.0, 0.0, 1.0, 0.0], [1.0, 0.0, 0.0, 0.0],
                                 #[0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
         source.transform(trans_init)
-        draw_registration_result(source, target, np.identity(4))
+        # draw_registration_result(source, target, np.identity(4))
 
         source_down, source_fpfh = preprocess_point_cloud(source, voxel_size)
         target_down, target_fpfh = preprocess_point_cloud(target, voxel_size)
@@ -275,7 +251,7 @@ def global_fast_registration(source, target,voxel_size=0.05): # means 5cm for th
         distance_threshold = voxel_size * 0.5
         print(":: Apply fast global registration with distance threshold %.3f" \
                 % distance_threshold)
-        result = o3d.pipelines.registration.registration_fast_based_on_feature_matching(
+        result = o3d.pipelines.registration.registration_fgr_based_on_feature_matching(
             source_down, target_down, source_fpfh, target_fpfh,
             o3d.pipelines.registration.FastGlobalRegistrationOption(
                 maximum_correspondence_distance=distance_threshold))
@@ -288,6 +264,32 @@ def global_fast_registration(source, target,voxel_size=0.05): # means 5cm for th
     #print("Fast global registration took %.3f sec.\n" % (time.time() - start))
     print(result_fast)
     draw_registration_result(source_down, target_down, result_fast.transformation)
+    return source_down, target_down
+
+
+
+def closest_lidarpoint_for_colmappoint(lidar_path, colmap_pcd):
+    """ find closest_index in PC2 such that PC1 ~~ PC2[closest_index]
+    PC1: colored_pc
+    PC2: lidar_pc
+    return: closest_index
+    """
+    #lidar = PlyData.read(lidar_path)
+
+    input_las = laspy.read(lidar_path)
+    point_records = input_las.points.copy()
+    # calculating coordinates
+    p_X = np.array((point_records['X'] * las_scaleX) + las_offsetX)
+    p_Y = np.array((point_records['Y'] * las_scaleY) + las_offsetY)
+    p_Z = np.array((point_records['Z'] * las_scaleZ) + las_offsetZ)
+
+    xyz = np.vstack((p_X, p_Y, p_Z)).transpose()
+    print(xyz.shape)
+
+
+    PC1 = PC2[index]
+
+    return PC1
 
 
 if __name__ == "__main__":
@@ -318,8 +320,14 @@ if __name__ == "__main__":
     #write_ply(point1, name, path) ## comment for global_fast_registration
 
     "Step3: registration the rescaled lidar_point and points3D"
-    full_path = path + r'\points3D.ply'
-    new_path = path + r'\lidar3D.ply'
+    full_path = path + r'\lidar3D_init_register.ply'
+    new_path = path + r'\points3D.ply'
     source = o3d.io.read_point_cloud(full_path)
     target = o3d.io.read_point_cloud(new_path)
-    global_fast_registration(source, target, voxel_size=0.05)
+    source_down, _ = global_fast_registration(source, target, voxel_size=0.05)
+
+    "Step4: save sparse lidar3D_register "
+    #write_ply(source_down,'\lidar3D_register.ply', path) 
+    o3d.io.write_point_cloud(path+'\lidar3D_register.ply', source_down)
+
+    "Step5: replace points3D.ply by closest lidar3D_register"
