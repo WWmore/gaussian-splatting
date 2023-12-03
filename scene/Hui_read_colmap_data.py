@@ -89,6 +89,11 @@ def read_ply(path):
     point_cloud_in_numpy = np.asarray(pcd.points) 
     return point_cloud_in_numpy
 
+def write_ply(point, name, path):
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(point)
+    o3d.io.write_point_cloud(path+name, pcd)
+
 def plot_pointcloud(point):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(point)
@@ -175,6 +180,7 @@ def rescale_two_pointclouds(point1, point2):
     point1 += centroid2 - centroid1
 
     plot_multi_pointclouds(point1, point2)
+
     return point1, point2
 
 def write_lidar_point(point):
@@ -190,29 +196,98 @@ def write_lidar_point(point):
     # pcd = o3d.io.read_point_cloud('my_pts.ply')
 
 
-def register_colmappoint_with_lidarpoint(lidar_path, colmap_pcd):
-    """ find closest_index in PC2 such that PC1 ~~ PC2[closest_index]
-    PC1: colored_pc
-    PC2: lidar_pc
-    return: closest_index
-    """
-    #lidar = PlyData.read(lidar_path)
+# def register_colmappoint_with_lidarpoint(lidar_path, colmap_pcd):
+#     """ find closest_index in PC2 such that PC1 ~~ PC2[closest_index]
+#     PC1: colored_pc
+#     PC2: lidar_pc
+#     return: closest_index
+#     """
+#     #lidar = PlyData.read(lidar_path)
 
-    input_las = laspy.read(lidar_path)
-    point_records = input_las.points.copy()
-    # calculating coordinates
-    p_X = np.array((point_records['X'] * las_scaleX) + las_offsetX)
-    p_Y = np.array((point_records['Y'] * las_scaleY) + las_offsetY)
-    p_Z = np.array((point_records['Z'] * las_scaleZ) + las_offsetZ)
+#     input_las = laspy.read(lidar_path)
+#     point_records = input_las.points.copy()
+#     # calculating coordinates
+#     p_X = np.array((point_records['X'] * las_scaleX) + las_offsetX)
+#     p_Y = np.array((point_records['Y'] * las_scaleY) + las_offsetY)
+#     p_Z = np.array((point_records['Z'] * las_scaleZ) + las_offsetZ)
 
-    xyz = np.vstack((p_X, p_Y, p_Z)).transpose()
-    print(xyz.shape)
+#     xyz = np.vstack((p_X, p_Y, p_Z)).transpose()
+#     print(xyz.shape)
 
 
-    PC1 = PC2[index]
+#     PC1 = PC2[index]
 
-    return PC1
+#     return PC1
 
+
+def draw_registration_result(source, target, transformation):
+    import copy
+    source_temp = copy.deepcopy(source)
+    target_temp = copy.deepcopy(target)
+    source_temp.paint_uniform_color([1, 0.706, 0])
+    target_temp.paint_uniform_color([0, 0.651, 0.929])
+    source_temp.transform(transformation)
+    o3d.visualization.draw_geometries([source_temp, target_temp],
+                                      zoom=0.4559,
+                                      front=[0.6452, -0.3036, -0.7011],
+                                      lookat=[1.9892, 2.0208, 1.8945],
+                                      up=[-0.2779, -0.9482, 0.1556])
+
+
+def global_fast_registration(source, target,voxel_size=0.05): # means 5cm for the dataset
+
+    def preprocess_point_cloud(pcd, voxel_size):
+        print(":: Downsample with a voxel size %.3f." % voxel_size)
+        pcd_down = pcd.voxel_down_sample(voxel_size)
+
+        radius_normal = voxel_size * 2
+        print(":: Estimate normal with search radius %.3f." % radius_normal)
+        pcd_down.estimate_normals(
+            o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
+
+        radius_feature = voxel_size * 5
+        print(":: Compute FPFH feature with search radius %.3f." % radius_feature)
+        pcd_fpfh = o3d.pipelines.registration.compute_fpfh_feature(
+            pcd_down,
+            o3d.geometry.KDTreeSearchParamHybrid(radius=radius_feature, max_nn=100))
+        return pcd_down, pcd_fpfh
+
+    def prepare_dataset(voxel_size, source, target):
+        print(":: Load two point clouds and disturb initial pose.")
+
+        # demo_icp_pcds = o3d.data.DemoICPPointClouds()
+        # source = o3d.io.read_point_cloud(demo_icp_pcds.paths[0])
+        # target = o3d.io.read_point_cloud(demo_icp_pcds.paths[1])
+
+        trans_init = np.identity(4) # np.asarray([[0.0, 0.0, 1.0, 0.0], [1.0, 0.0, 0.0, 0.0],
+                                #[0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+        source.transform(trans_init)
+        draw_registration_result(source, target, np.identity(4))
+
+        source_down, source_fpfh = preprocess_point_cloud(source, voxel_size)
+        target_down, target_fpfh = preprocess_point_cloud(target, voxel_size)
+        return source, target, source_down, target_down, source_fpfh, target_fpfh
+
+    source, target, source_down, target_down, source_fpfh, target_fpfh = prepare_dataset(voxel_size, source, target)
+    
+    def execute_fast_global_registration(source_down, target_down, source_fpfh,
+                                     target_fpfh, voxel_size):
+        distance_threshold = voxel_size * 0.5
+        print(":: Apply fast global registration with distance threshold %.3f" \
+                % distance_threshold)
+        result = o3d.pipelines.registration.registration_fast_based_on_feature_matching(
+            source_down, target_down, source_fpfh, target_fpfh,
+            o3d.pipelines.registration.FastGlobalRegistrationOption(
+                maximum_correspondence_distance=distance_threshold))
+        return result
+
+    #start = time.time()
+    result_fast = execute_fast_global_registration(source_down, target_down,
+                                                source_fpfh, target_fpfh,
+                                                voxel_size)
+    #print("Fast global registration took %.3f sec.\n" % (time.time() - start))
+    print(result_fast)
+    draw_registration_result(source_down, target_down, result_fast.transformation)
 
 
 if __name__ == "__main__":
@@ -231,8 +306,20 @@ if __name__ == "__main__":
 
     point2 = read_ply(colmap_ply_path)
 
+    "Step0: plot"
     #plot_multi_pointclouds(point1, point2)
 
-    rescale_two_pointclouds(point1, point2)
+    "Step1: rescale lidar_points to be compatible with points3D"
+    #point1,_ = rescale_two_pointclouds(point1, point2) ## comment for global_fast_registration
 
+    "Step2: save the rescaled lidar_points"
+    path = r'C:\Users\WANGH0M\gaussian-splatting\data_Dji_L2\sparse\0'
+    name = '\lidar3D.ply'
+    #write_ply(point1, name, path) ## comment for global_fast_registration
 
+    "Step3: registration the rescaled lidar_point and points3D"
+    full_path = path + r'\points3D.ply'
+    new_path = path + r'\lidar3D.ply'
+    source = o3d.io.read_point_cloud(full_path)
+    target = o3d.io.read_point_cloud(new_path)
+    global_fast_registration(source, target, voxel_size=0.05)
