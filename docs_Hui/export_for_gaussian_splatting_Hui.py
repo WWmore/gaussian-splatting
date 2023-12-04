@@ -281,18 +281,27 @@ def get_calibs(camera, calibs):
 
 
 #-------------------------------------------------------------------------
-def replace_tie_points_by_lidar(tie_points, lidar_points, k=1): ##Hui add
+def replace_tie_points_by_lidar(tie_points, lidar_points, k=1, is_array=False):
     """replace tie_points by lidar_points[ind];
     in Dji_L2_lidar data: lidar_points are more than tie_points
     """
-    lidar_pcd = o3d.PointCloud()
-    lidar_pcd.points = o3d.Vector3dVector(lidar_points)
-    lidar_pcd_tree = o3d.KDTreeFlann(lidar_pcd)
+    if is_array:
+        "suppose: tie_points, lidar_points are both np.array"
+        lidar_pcd = o3d.geometry.PointCloud()
+        lidar_pcd.points = o3d.utility.Vector3dVector(lidar_points)
+        lidar_pcd_tree = o3d.geometry.KDTreeFlann(lidar_pcd)
+        for i, tie in enumerate(tie_points):
+            _, lidar_ind, _ = lidar_pcd_tree.search_knn_vector_3d(tie, k)
+            tie_points[i] = lidar_points[lidar_ind] ##TypeError: 'open3d.cpu.pybind.geometry.PointCloud' object is not subscriptable
+        return tie_points
+    else:
+        "suppose: tie_points, lidar_points are both open3d"
+        lidar_pcd_tree = o3d.geometry.KDTreeFlann(lidar_points)
 
-    for i, tie in enumerate(tie_points.points):
-        _, lidar_ind, _ = lidar_pcd_tree.search_knn_vector_3d(tie, k)
-        tie_points.points[i] = lidar_pcd[lidar_ind]
-    return tie_points
+        for i, tie in enumerate(tie_points.points):
+            _, lidar_ind, _ = lidar_pcd_tree.search_knn_vector_3d(tie, k)
+            tie_points.points[i] = lidar_points.points[lidar_ind[0]] ##TypeError: 'open3d.cpu.pybind.geometry.PointCloud' object is not subscriptable
+        return tie_points
 
 def read_lidar(path): ##Hui add
     #path1 = r'C:\Users\WANGH0M\Desktop\LiDAR\Zenmuse L1 202107 Rio Brazos.las' ##(40824215, 3)
