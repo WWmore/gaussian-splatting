@@ -79,28 +79,50 @@ def read_lidar2(path):
     xyz = np.vstack((p_X, p_Y, p_Z)).transpose()
     return xyz
 
-def read_ply(path):
+def read_ply(path, is_array=False):
     pcd = o3d.io.read_point_cloud(path) # Read the point cloud
 
     # Visualize the point cloud within open3d
     #o3d.visualization.draw_geometries([pcd]) 
+    if is_array:
+        # Convert open3d format to numpy array
+        point_cloud_in_numpy = np.asarray(pcd.points) 
+        return point_cloud_in_numpy
+    else:
+        return pcd
 
-    # Convert open3d format to numpy array
-    point_cloud_in_numpy = np.asarray(pcd.points) 
-    return point_cloud_in_numpy
+def write_ply(point, name, path, is_array=False):
+    if is_array:
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(point)
+        o3d.io.write_point_cloud(path+name, pcd)
+    else:
+        o3d.io.write_point_cloud(path+name, point)
 
-def write_ply(point, name, path):
+def write_lidar_point(point):
     pcd = o3d.geometry.PointCloud()
+
+    # the method Vector3dVector() will convert numpy array of shape (n, 3) to Open3D format.
     pcd.points = o3d.utility.Vector3dVector(point)
-    o3d.io.write_point_cloud(path+name, pcd)
+
+    # http://www.open3d.org/docs/release/python_api/open3d.io.write_point_cloud.html#open3d.io.write_point_cloud
+    o3d.io.write_point_cloud("my_pts.ply", pcd, write_ascii=True)
+
+    # read ply file
+    # pcd = o3d.io.read_point_cloud('my_pts.ply')
 
 def plot_pointcloud(point):
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(point)
     o3d.visualization.draw_geometries([pcd])
 
-def plot_multi_pointclouds(point1, point2):
-    if True:
+def plot_multi_pointclouds(point1, point2, is_array=False):
+    "both point1, point2 are open3d"
+    if True: 
+        "if types are both np.array"
+        o3d.visualization.draw_geometries([point1, point2])
+    elif is_array:
+        "if types are both np.array"
         pcd1 = o3d.geometry.PointCloud()
         pcd1.points = o3d.utility.Vector3dVector(point1)
         pcd2 = o3d.geometry.PointCloud()
@@ -170,7 +192,11 @@ def get_pointcloud_boundingbox(point):
     # d4 = np.linalg.norm(corner[3]-corner[5])
     return centroid, d1
 
-def rescale_two_pointclouds(point1, point2):
+def rescale_two_pointclouds(pcd1, pcd2, is_array=False):
+    "input and return are both open3d"
+    point1 = np.asarray(pcd1.points) 
+    point2 = np.asarray(pcd2.points) 
+
     _, d1 = get_pointcloud_boundingbox(point1)
     centroid2, d2 = get_pointcloud_boundingbox(point2)
     point1 *= d2 / d1
@@ -179,22 +205,11 @@ def rescale_two_pointclouds(point1, point2):
     centroid1 = np.mean(corner1, axis=0)
     point1 += centroid2 - centroid1
 
-    plot_multi_pointclouds(point1, point2)
+    pcd1.points = o3d.utility.Vector3dVector(point1)
+    pcd2.points = o3d.utility.Vector3dVector(point2)
+    plot_multi_pointclouds(pcd1, pcd2, is_array=False)
 
-    return point1, point2
-
-def write_lidar_point(point):
-    pcd = o3d.geometry.PointCloud()
-
-    # the method Vector3dVector() will convert numpy array of shape (n, 3) to Open3D format.
-    pcd.points = o3d.utility.Vector3dVector(point)
-
-    # http://www.open3d.org/docs/release/python_api/open3d.io.write_point_cloud.html#open3d.io.write_point_cloud
-    o3d.io.write_point_cloud("my_pts.ply", pcd, write_ascii=True)
-
-    # read ply file
-    # pcd = o3d.io.read_point_cloud('my_pts.ply')
-
+    return pcd1, pcd2
 
 def draw_registration_result(source, target, transformation):
     import copy
@@ -208,10 +223,10 @@ def draw_registration_result(source, target, transformation):
                                       front=[0.6452, -0.3036, -0.7011],
                                       lookat=[1.9892, 2.0208, 1.8945],
                                       up=[-0.2779, -0.9482, 0.1556])
-
+    return source_temp
 
 def global_fast_registration(source, target,voxel_size=0.05): # means 5cm for the dataset
-
+    "both input and return are open3d not np.array"
     def preprocess_point_cloud(pcd, voxel_size):
         print(":: Downsample with a voxel size %.3f." % voxel_size)
         pcd_down = pcd.voxel_down_sample(voxel_size)
@@ -263,33 +278,30 @@ def global_fast_registration(source, target,voxel_size=0.05): # means 5cm for th
                                                 voxel_size)
     #print("Fast global registration took %.3f sec.\n" % (time.time() - start))
     print(result_fast)
-    draw_registration_result(source_down, target_down, result_fast.transformation)
-    return source_down, target_down
+    source_temp = draw_registration_result(source_down, target_down, result_fast.transformation)
+    return source_temp, target_down
 
-
-
-def closest_lidarpoint_for_colmappoint(lidar_path, colmap_pcd):
-    """ find closest_index in PC2 such that PC1 ~~ PC2[closest_index]
-    PC1: colored_pc
-    PC2: lidar_pc
-    return: closest_index
+def replace_tie_points_by_lidar(tie_points, lidar_points, k=1, is_array=False):
+    """replace tie_points by lidar_points[ind];
+    in Dji_L2_lidar data: lidar_points are more than tie_points
     """
-    #lidar = PlyData.read(lidar_path)
+    if is_array:
+        "suppose: tie_points, lidar_points are both np.array"
+        lidar_pcd = o3d.geometry.PointCloud()
+        lidar_pcd.points = o3d.utility.Vector3dVector(lidar_points)
+        lidar_pcd_tree = o3d.geometry.KDTreeFlann(lidar_pcd)
+        for i, tie in enumerate(tie_points):
+            _, lidar_ind, _ = lidar_pcd_tree.search_knn_vector_3d(tie, k)
+            tie_points[i] = lidar_points[lidar_ind]
+        return tie_points
+    else:
+        "suppose: tie_points, lidar_points are both open3d"
+        lidar_pcd_tree = o3d.geometry.KDTreeFlann(lidar_points)
 
-    input_las = laspy.read(lidar_path)
-    point_records = input_las.points.copy()
-    # calculating coordinates
-    p_X = np.array((point_records['X'] * las_scaleX) + las_offsetX)
-    p_Y = np.array((point_records['Y'] * las_scaleY) + las_offsetY)
-    p_Z = np.array((point_records['Z'] * las_scaleZ) + las_offsetZ)
-
-    xyz = np.vstack((p_X, p_Y, p_Z)).transpose()
-    print(xyz.shape)
-
-
-    PC1 = PC2[index]
-
-    return PC1
+        for i, tie in enumerate(tie_points.points):
+            _, lidar_ind, _ = lidar_pcd_tree.search_knn_vector_3d(tie, k)
+            tie_points.points[i] = lidar_points.points[lidar_ind[0]]
+        return tie_points
 
 
 if __name__ == "__main__":
@@ -299,35 +311,48 @@ if __name__ == "__main__":
     colmap_ply_path = r'C:\Users\WANGH0M\gaussian-splatting\data_Dji_L2\sparse\0\points3D.ply'
 
     if 0:
-        point1 = read_lidar(lidar_path) ## or point = read_lidar2(lidar_path)
-        ## print(point1) ##PointCloud with 274741051 points
-        #plot_pointcloud(point1)
+        points1 = read_lidar(lidar_path) ## or point = read_lidar2(lidar_path)
+        ## print(points1) ##PointCloud with 274741051 points
+        #plot_pointcloud(points1)
     else:
         "above way is much slower and still has the RuntimeError: QH6235 qhull error (qh_memalloc)"
-        point1 = read_ply(lidar_ply_path)
+        points1 = read_ply(lidar_ply_path,is_array=False)
 
-    point2 = read_ply(colmap_ply_path)
+    points2 = read_ply(colmap_ply_path,is_array=False) ##points3D.ply
+
+    #---------------------------------------------------------
+    "Hui: below steps are run and implement one by one; results see the img."
 
     "Step0: plot"
-    #plot_multi_pointclouds(point1, point2)
+    #plot_multi_pointclouds(points1, points2)
 
     "Step1: rescale lidar_points to be compatible with points3D"
-    #point1,_ = rescale_two_pointclouds(point1, point2) ## comment for global_fast_registration
+    #points1,_ = rescale_two_pointclouds(points1, points2) ## comment for global_fast_registration
 
     "Step2: save the rescaled lidar_points"
     path = r'C:\Users\WANGH0M\gaussian-splatting\data_Dji_L2\sparse\0'
     name = '\lidar3D.ply'
-    #write_ply(point1, name, path) ## comment for global_fast_registration
+    #write_ply(points1, name, path, is_array=False) ## comment for global_fast_registration
 
-    "Step3: registration the rescaled lidar_point and points3D"
-    full_path = path + r'\lidar3D_init_register.ply'
-    new_path = path + r'\points3D.ply'
-    source = o3d.io.read_point_cloud(full_path)
-    target = o3d.io.read_point_cloud(new_path)
-    source_down, _ = global_fast_registration(source, target, voxel_size=0.05)
+    "Step3: in CloudCompare software, align lidar3D.ply to points2"
 
-    "Step4: save sparse lidar3D_register "
-    #write_ply(source_down,'\lidar3D_register.ply', path) 
-    o3d.io.write_point_cloud(path+'\lidar3D_register.ply', source_down)
+    "Step4: registration the rescaled lidar_point and points3D"
+    # full_path = path + r'\lidar3D_init_register.ply'
+    # new_path = path + r'\points3D.ply'
+    # source = o3d.io.read_point_cloud(full_path)
+    # target = o3d.io.read_point_cloud(new_path)
+    # source_down, _ = global_fast_registration(source, target, voxel_size=0.05)
 
-    "Step5: replace points3D.ply by closest lidar3D_register"
+    "Step5: save sparse lidar3D_register "
+    #write_ply(source_down,'\lidar3D_register.ply', path, is_array=False) 
+
+    "Step6: replace points3D.ply by closest lidar3D_register"
+    source_down = read_ply(path+'\lidar3D_register.ply',is_array=False)
+    points3D = replace_tie_points_by_lidar(points2, source_down, k=1, is_array=False)
+    
+    "Step7: save replaced points3D"
+    write_ply(points3D,'\points3D_new.ply', path,is_array=False)
+
+    "Step8: replace folder sparse+images in data_Dji_L2 to data_Dji_L2_lidar; rename points3D_new.ply to points3D.ply"
+    "Step9: in anaconda prompt: >python train.py -s data_Dji_L2_lidar"
+    "Step10: plotting in https://playcanvas.com/viewer"
